@@ -1,0 +1,180 @@
+
+
+Requirements:
+
+Expense tracking
+
+-- User should be able to create an expense within a group
+-- User should be able to see how much he is owed within group
+-- User should be able to see how much he owes within group
+-- User should be able to see how much he is owed
+-- User should be able to see how much he owes
+-- Create Group (not required)
+-- Add users to group (not required)
+-- simplify expenses within group (i.e. if A owes B 10 and B owes A 5, then A owes B 5) - extension
+-- Balance book within a group ( Group summary) - required
+
+
+group part of request , no need to validate if user belongs to group
+
+
+
+
+expense - group id, [user ids]
+group summary -
+individual summary - groupwise split - individualwise split (per user owe)
+
+
+/api/v1/expenses POST create expense
+{
+    "group_id": 1,
+    "user_split": [{
+        "user_id": 1,
+        "paid": 120, -70 -20
+        "val": 20
+        },
+        {
+        "user_id": 2,
+        "val": 80,
+        "paid": 80 - -30
+        },
+        {
+        "user_id": 3,
+        "val": 50, 50, 0
+        }
+        {
+        "user_id": 4,
+        "val": 50, 50 50
+        }
+    }],
+    "amount": 200
+    "type": "EQUAL" // EQUAL, PERCENTAGE, EXACT
+}
+
+/api/v1/groups/{id}/summary GET
+
+response :
+
+{
+    "total_expenses": 100
+    "owes_to": [{
+        "from_user": 1,
+        "to_user": 2,
+        "amount": 20
+        },
+        {
+        "from_user": 2,
+        "to_user": 1,
+        "amount": 30
+        }
+    }],
+    "owed": [{
+        "from_user": 1,
+        "to_user": 2,
+        "amount": 20
+        },
+        {
+        "from_user": 2,
+        "to_user": 1,
+        "amount": 30
+        }
+    }]
+}
+
+/api/v1/users/{id}/summary GET
+
+response:
+
+{
+    "total_expenses": 100
+    "group_wise": [
+    {
+        "group_id":1,
+        "owes_to": 30,
+        "owed": 70
+    }
+    ],
+    "individual_wise": [
+    {
+        "user_id":1,
+        "owes_to": 30,
+        "owed": 70
+    }
+    ]
+}
+
+Expense - group_id, user_id, amount, type, user_split
+
+
+map group_id to map of user
+
+group ids ->
+group_ids
+
+
+
+    u1  u2 u3
+ u1 0   -30 30
+ u2 30  0 50
+ u3 -30  -50  0
+
+ u1-> u2 30 arr[0][1] -
+
+
+ {
+    1:
+        {
+            "users" : {
+                1: {
+                    2: 40,
+                    3: -30
+                },
+                2: {
+                    1:-40,
+                    3: 50
+                },
+                3: {
+                    1: 30,
+                    2: -50
+                }
+            }
+        }
+    }
+ }
+
+ map groupid -> map userid -> map userid -> amount
+ map users -> [list of groupid]
+
+
+
+ Expense - group_id, user_id, amount, type, user_split
+
+
+CreateExpense API-
+
+
+    ExpenseEngine () -_ [user id -> {user id -> amount}]
+    {
+        1: {
+            2: 40,
+            3: -30
+        },
+        2: {
+            1:-40,
+            3: 50
+        },
+        3: {
+            1: 30,
+            2: -50
+        }
+    }
+    Add to group object
+
+
+    Group Summary API -
+    counter for total expense
+
+    balance fetcher - owes to
+                          owed
+
+
